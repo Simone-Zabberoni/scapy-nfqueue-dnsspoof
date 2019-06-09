@@ -2,8 +2,10 @@
 
 ## Description
 
-Intercept all dns queries, spoof the answer by requested domain.
-It's just a simple poc to test scapy+nfqueue toghether
+Intercept all dns queries, spoof the answer by requested FQDN.
+It's just a simple poc to test scapy+nfqueue toghether.
+
+dnsSpoof -q 1 -s www.youporn.com/1.2.3.4
 
 ## Requirements
 
@@ -11,22 +13,19 @@ It's just a simple poc to test scapy+nfqueue toghether
 - [Scapy](http://www.secdev.org/projects/scapy/)
 - gcc compiler, netfilter headers etc...
 
-
 ## Setup
 
 Install packages, on a Centos/RHEL machine:
 
 ```
-yum install python-pip
-yum install scapy
-yum install gcc python-devel libnfnetlink-devel libnetfilter_queue-devel libnetfilter_conntrack-devel
+yum -y install python-pip scapy
+yum -y install gcc python-devel libnfnetlink-devel libnetfilter_queue-devel libnetfilter_conntrack-devel
 ```
 
-Upgrade pip and install/compile the python module:
+Install the required python modules:
 
 ```
-pip install --upgrade pip
-pip install NetfilterQueue
+pip install -r requirements.txt
 ```
 
 ## Run it
@@ -34,9 +33,9 @@ pip install NetfilterQueue
 Activate the spoofer:
 
 ```
-[root@spoofmachine ~]# python dnsSpoof.py
+# ./dnsSpoof.py -q 1 -s www.youporn.com/1.2.3.4
 Intercepting nfqueue: 1
-Spoofing www.youporn.com to 1.1.1.1
+Spoofing www.youporn.com to 1.2.3.4
 ------------------------------------------
 ```
 
@@ -56,20 +55,24 @@ Spoofing in action, but only for the target domain
 
 ```
 [root@spoofmachine ~]# ping www.youporn.com
-PING www.youporn.com (1.1.1.1) 56(84) bytes of data.
+PING www.youporn.com (1.2.3.4) 56(84) bytes of data.
 
 [root@spoofmachine ~]# ping www.google.com
 PING www.google.com (216.58.205.132) 56(84) bytes of data.
 ```
 
 The spoofer shows the summary of the packets (`pkt.summary()` scapy function):
+
 ```
 Intercepted DNS request for www.youporn.com: IP / UDP / DNS Ans "youporn.com."
-Spoofing DNS response to: IP / UDP / DNS Ans "1.1.1.1"
+Spoofing DNS response to: IP / UDP / DNS Ans "1.2.3.4"
 ------------------------------------------
-Intercepted DNS request for www.youporn.com: IP / UDP / DNS Ans
-Spoofing DNS response to: IP / UDP / DNS Ans "1.1.1.1"
+Intercepted DNS request for www.youporn.com: IP / UDP / DNS Ans "youporn.com."
+Spoofing DNS response to: IP / UDP / DNS Ans "1.2.3.4"
+------------------------------------------
 ```
+
+**Important**: if you deactivate the spoofer, your system will be unable to resolve anything until you deactivate the iptables rule as well!
 
 ## References
 
