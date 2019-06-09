@@ -3,9 +3,13 @@
 ## Description
 
 Intercept all dns queries, spoof the answer by requested FQDN.
+
 It's just a simple poc to test scapy+nfqueue toghether.
 
+Usage:
+```
 dnsSpoof -q 1 -s www.youporn.com/1.2.3.4
+```
 
 ## Requirements
 
